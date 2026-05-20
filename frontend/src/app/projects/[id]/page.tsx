@@ -110,7 +110,7 @@ export default function ProjectDetailPage({
                 <div className="proj-hero__title">
                   <h1>{project.name}</h1>
                   <div className="meta">
-                    <span>{project.source === "youtrack" ? "YouTrack" : "Azure DevOps"}</span>
+                    <span>YouTrack + Azure DevOps</span>
                     {project.is_overdue && (
                       <span className="chip chip--overdue" style={{ marginLeft: 8 }}>
                         <span className="chip-dot" />

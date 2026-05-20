@@ -1,11 +1,12 @@
-export type ReleaseSource = "youtrack" | "azuredevops";
 export type NamingConvention = "semver" | "date" | "unknown";
 
 export interface ProjectSummary {
   id: string;
   slug: string;
   name: string;
-  source: ReleaseSource;
+  youtrack_project_id: string;
+  azuredevops_project: string;
+  azuredevops_repository: string;
   naming_convention: NamingConvention;
   release_cycle_days: number;
   current_version: string | null;
@@ -43,10 +44,9 @@ export interface ReleaseStats {
 
 export interface ProjectCreate {
   name: string;
-  source: ReleaseSource;
-  youtrack_project_id?: string;
-  azuredevops_project?: string;
-  azuredevops_repository?: string;
+  youtrack_project_id: string;
+  azuredevops_project: string;
+  azuredevops_repository: string;
   naming_convention: NamingConvention;
   release_cycle_days: number;
 }

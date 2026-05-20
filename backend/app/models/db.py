@@ -11,11 +11,6 @@ from sqlalchemy.sql import func
 from app.database import Base
 
 
-class ReleaseSource(str, PyEnum):
-    youtrack = "youtrack"
-    azuredevops = "azuredevops"
-
-
 class NamingConvention(str, PyEnum):
     semver = "semver"
     date = "date"
@@ -30,12 +25,9 @@ class Project(Base):
     )
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(200), nullable=False)
-    source: Mapped[ReleaseSource] = mapped_column(
-        SAEnum(ReleaseSource), nullable=False
-    )
-    youtrack_project_id: Mapped[str | None] = mapped_column(String(200), nullable=True)
-    azuredevops_project: Mapped[str | None] = mapped_column(String(200), nullable=True)
-    azuredevops_repository: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    youtrack_project_id: Mapped[str] = mapped_column(String(200), nullable=False)
+    azuredevops_project: Mapped[str] = mapped_column(String(200), nullable=False)
+    azuredevops_repository: Mapped[str] = mapped_column(String(200), nullable=False)
     naming_convention: Mapped[NamingConvention] = mapped_column(
         SAEnum(NamingConvention), nullable=False, default=NamingConvention.semver
     )

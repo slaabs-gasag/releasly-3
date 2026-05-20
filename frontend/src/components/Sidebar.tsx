@@ -63,8 +63,7 @@ export default function Sidebar({ projects }: Props) {
               <div className="sb__proj-name">
                 <b>{p.name}</b>
                 <span>
-                  {p.source === "youtrack" ? "YouTrack" : "Azure DevOps"}
-                  {p.current_version ? ` · v${p.current_version}` : ""}
+                  {p.current_version ? `v${p.current_version}` : "kein Release"}
                 </span>
               </div>
               {badge && <span className="sb__count">{badge}</span>}

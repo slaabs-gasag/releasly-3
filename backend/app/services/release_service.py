@@ -55,7 +55,9 @@ async def get_project_summaries(db: AsyncSession) -> list[ProjectSummary]:
                 id=project.id,
                 slug=project.slug,
                 name=project.name,
-                source=project.source,
+                youtrack_project_id=project.youtrack_project_id,
+                azuredevops_project=project.azuredevops_project,
+                azuredevops_repository=project.azuredevops_repository,
                 naming_convention=project.naming_convention,
                 release_cycle_days=project.release_cycle_days,
                 current_version=current_version,
@@ -77,26 +79,37 @@ async def refresh_project(
     azuredevops_url: str | None,
     db: AsyncSession,
 ) -> None:
-    from app.models.db import ReleaseSource
     from app.services.youtrack_service import YouTrackService
     from app.services.azuredevops_service import AzureDevOpsService
 
-    logger.info("refresh_project start project_id=%s source=%s", project.id, project.source)
+    logger.info("refresh_project start project_id=%s", project.id)
     start = datetime.now(timezone.utc)
 
     try:
         releases: list[Release] = []
-        if project.source == ReleaseSource.youtrack and youtrack_token and youtrack_url:
-            svc = YouTrackService(base_url=youtrack_url, token=youtrack_token)
-            releases = await svc.fetch_releases(project.youtrack_project_id or "")
-        elif project.source == ReleaseSource.azuredevops and azuredevops_pat and azuredevops_url:
+        seen_versions: set[str] = set()
+
+        if azuredevops_pat and azuredevops_url:
             svc = AzureDevOpsService(org_url=azuredevops_url, pat=azuredevops_pat)
-            releases = await svc.fetch_releases(
-                project.azuredevops_project or "",
-                project.azuredevops_repository or "",
+            azdo_releases = await svc.fetch_releases(
+                project.azuredevops_project,
+                project.azuredevops_repository,
             )
-        else:
-            logger.info("refresh_project skip project_id=%s no credentials", project.id)
+            for r in azdo_releases:
+                if r.version not in seen_versions:
+                    releases.append(r)
+                    seen_versions.add(r.version)
+
+        if youtrack_token and youtrack_url:
+            svc = YouTrackService(base_url=youtrack_url, token=youtrack_token)
+            yt_releases = await svc.fetch_releases(project.youtrack_project_id)
+            for r in yt_releases:
+                if r.version not in seen_versions:
+                    releases.append(r)
+                    seen_versions.add(r.version)
+
+        if not releases:
+            logger.info("refresh_project skip project_id=%s no credentials or no data", project.id)
             return
 
         # Replace cached releases for this project
