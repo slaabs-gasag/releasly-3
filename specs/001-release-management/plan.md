@@ -7,22 +7,23 @@
 ## Summary
 
 Build Releasly — an internal release management dashboard that aggregates release data from
-YouTrack and Azure DevOps. Architecture: Python FastAPI backend + Next.js 14 frontend +
-PostgreSQL. Each user stores their own API credentials (YouTrack bearer token, Azure DevOps
-PAT) in browser localStorage; the backend receives them per-request and never persists them.
-Project definitions and cached release data are stored in PostgreSQL. Only the PostgreSQL
-connection string lives in `.env`.
+YouTrack and Azure DevOps. Architecture: Python FastAPI backend + Next.js 16 / React 19
+frontend + PostgreSQL 18. Each user stores their own API credentials (YouTrack bearer token,
+Azure DevOps PAT) in browser localStorage; the backend receives them per-request and never
+persists them. Project definitions and cached release data are stored in PostgreSQL. Only the
+PostgreSQL connection string lives in `.env`.
 
 ## Technical Context
 
-**Language/Version**: Python 3.12 (backend), TypeScript 5 / Node.js 20 (frontend)
+**Language/Version**: Python 3.12 (backend), TypeScript 5 / Node.js 24.15.0 LTS (frontend)
 
 **Primary Dependencies**:
 - Backend: FastAPI, httpx (async HTTP), pydantic v2, python-dotenv, SQLAlchemy 2.x,
   asyncpg, alembic, uvicorn
-- Frontend: Next.js 14, React 18, NextAuth.js v5 (Entra ID OIDC), Recharts, Tailwind CSS
+- Frontend: Next.js 16.2.6, React 19, NextAuth.js v5 / Auth.js (Entra ID OIDC), Recharts,
+  Tailwind CSS v4
 
-**Storage**: PostgreSQL 15 (`projects` + `cached_releases` tables via SQLAlchemy 2.x async +
+**Storage**: PostgreSQL 18.4 (`projects` + `cached_releases` tables via SQLAlchemy 2.x async +
 asyncpg). Alembic for migrations. No file-based config. `.env` holds only `DATABASE_URL`.
 
 **Testing**:
@@ -132,7 +133,7 @@ frontend/
 │   │       └── new/
 │   │           └── page.tsx           # US4: add project form
 │   ├── lib/
-│   │   └── auth.ts                    # NextAuth.js config (Entra ID provider + dev provider)
+│   │   └── auth.ts                    # Auth.js config (Entra ID provider + dev provider)
 │   ├── middleware.ts                  # Protect all routes; redirect to /auth/signin if no session
 │   ├── components/
 │   │   ├── SignInButton.tsx            # Entra ID sign-in button
@@ -167,8 +168,8 @@ frontend/
 │       ├── project-management.spec.ts # US5: add/edit/delete project
 │       └── charts.spec.ts             # US6: charts visible
 ├── public/
-├── next.config.js
-├── tailwind.config.ts
+├── next.config.ts           # TypeScript config (Next.js 15 supports .ts)
+├── src/app/globals.css      # Tailwind v4: @import "tailwindcss" + @theme tokens
 └── package.json
 ```
 

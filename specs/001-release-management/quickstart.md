@@ -5,8 +5,8 @@
 ## Prerequisites
 
 - Python 3.12+
-- Node.js 20+
-- PostgreSQL 15+
+- Node.js 24.15.0 LTS+
+- PostgreSQL 18.4+
 - Personal access credentials for YouTrack and/or Azure DevOps
 
 ## 1. Clone & Configure
@@ -69,7 +69,7 @@ Expected: `{"status":"ok","database":"connected"}`
 
 ```bash
 cd frontend
-npm install
+npm install    # installs Next.js 15, React 19, Tailwind v4, Auth.js
 npm run dev
 ```
 

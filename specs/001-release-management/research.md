@@ -33,9 +33,41 @@ Keycloak — not available internally; no auth — rejected by user requirement.
 
 ---
 
+## Version Decisions (Updated 2026-05-20)
+
+**Decision**: Use latest stable versions of all frontend/database dependencies.
+
+| Technology | Version | Notes |
+|------------|---------|-------|
+| Next.js | 16.2.6 | App Router, React 19 support, `next.config.ts` |
+| React | 19.x | New hooks (`use()`, `useActionState()`), Server Actions |
+| Tailwind CSS | 4.x | CSS-first config; no `tailwind.config.ts`; `@import "tailwindcss"` in globals.css |
+| Node.js | 24.15.0 LTS | Current LTS |
+| PostgreSQL | 18.4 | Latest stable; no breaking changes for asyncpg usage |
+| Python | 3.12 | Unchanged |
+
+**Tailwind v4 key changes** (affects project structure):
+- Configuration moved to CSS: use `@theme {}` block in `globals.css` for custom tokens
+- No `tailwind.config.ts` / `tailwind.config.js` file needed
+- PostCSS plugin updated: `@tailwindcss/postcss` instead of `tailwindcss`
+- Class names unchanged for most utilities; some deprecated v3 utilities removed
+- Built-in CSS nesting support
+
+**React 19 key changes** (affects component patterns):
+- `useFormStatus()` and `useActionState()` replace patterns from React 18
+- Server Components stable; `use()` hook for async data in components
+- No migration required for basic component patterns
+
+**Next.js 15 key changes** (affects structure):
+- `next.config.ts` (TypeScript) supported natively
+- `fetch` caching defaults changed: opt-in caching instead of opt-out
+- Auth.js (NextAuth v5) fully compatible
+
+---
+
 ## Architecture Decision
 
-**Decision**: Python FastAPI backend + Next.js 14 frontend + PostgreSQL database.
+**Decision**: Python FastAPI backend + Next.js 16.2.6 / React 19 frontend + PostgreSQL 18.4.
 
 **Rationale**: User explicitly specified both. FastAPI handles async HTTP integration
 work (YouTrack + Azure DevOps APIs) and PostgreSQL persistence. Next.js provides
