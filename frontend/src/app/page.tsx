@@ -144,7 +144,6 @@ export default function DashboardPage() {
 
 function ProjectCard({ project }: { project: ProjectSummary }) {
   const convention = project.naming_convention === "semver" ? "SemVer" : project.naming_convention === "date" ? "CalVer" : null;
-  const source = project.source === "youtrack" ? "YouTrack" : "Azure DevOps";
 
   return (
     <Link href={`/projects/${project.id}`} className="proj-card">
@@ -172,7 +171,7 @@ function ProjectCard({ project }: { project: ProjectSummary }) {
           </h2>
           <div className="proj-card__meta">
             <GitIcon />
-            {source}
+            YouTrack + Azure DevOps
           </div>
         </div>
 

@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.models.db import CachedRelease, Project, ReleaseSource
+from app.models.db import CachedRelease, Project
 from app.models.errors import AuthenticationError, IntegrationUnavailableError
 from app.models.release import Release
 
@@ -36,19 +36,25 @@ async def get_releases(
     source = "live"
 
     try:
-        if project.source == ReleaseSource.youtrack and x_youtrack_token and x_youtrack_url:
-            from app.services.youtrack_service import YouTrackService
-            svc = YouTrackService(base_url=x_youtrack_url, token=x_youtrack_token)
-            releases = await svc.fetch_releases(project.youtrack_project_id or "")
-        elif project.source == ReleaseSource.azuredevops and x_azuredevops_pat and x_azuredevops_url:
+        fetched = False
+        seen: set[str] = set()
+        if x_azuredevops_pat and x_azuredevops_url:
             from app.services.azuredevops_service import AzureDevOpsService
             svc = AzureDevOpsService(org_url=x_azuredevops_url, pat=x_azuredevops_pat)
-            releases = await svc.fetch_releases(
-                project.azuredevops_project or "",
-                project.azuredevops_repository or "",
-            )
-        else:
-            # Fall through to cache
+            for r in await svc.fetch_releases(project.azuredevops_project, project.azuredevops_repository):
+                if r.version not in seen:
+                    releases.append(r)
+                    seen.add(r.version)
+            fetched = True
+        if x_youtrack_token and x_youtrack_url:
+            from app.services.youtrack_service import YouTrackService
+            svc = YouTrackService(base_url=x_youtrack_url, token=x_youtrack_token)
+            for r in await svc.fetch_releases(project.youtrack_project_id):
+                if r.version not in seen:
+                    releases.append(r)
+                    seen.add(r.version)
+            fetched = True
+        if not fetched:
             raise IntegrationUnavailableError("No credentials provided")
     except AuthenticationError:
         raise HTTPException(status_code=401, detail="Integration credentials rejected")

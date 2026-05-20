@@ -1,24 +1,22 @@
 import uuid
 from datetime import datetime, timezone
 
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, Field
 
-from app.models.db import NamingConvention, ReleaseSource
+from app.models.db import NamingConvention
 
 
 class ProjectCreate(BaseModel):
     name: str
-    source: ReleaseSource
-    youtrack_project_id: str | None = None
-    azuredevops_project: str | None = None
-    azuredevops_repository: str | None = None
+    youtrack_project_id: str = Field(min_length=1)
+    azuredevops_project: str = Field(min_length=1)
+    azuredevops_repository: str = Field(min_length=1)
     naming_convention: NamingConvention = NamingConvention.semver
     release_cycle_days: int = 14
 
 
 class ProjectUpdate(BaseModel):
     name: str | None = None
-    source: ReleaseSource | None = None
     youtrack_project_id: str | None = None
     azuredevops_project: str | None = None
     azuredevops_repository: str | None = None
@@ -30,7 +28,9 @@ class ProjectSummary(BaseModel):
     id: uuid.UUID
     slug: str
     name: str
-    source: ReleaseSource
+    youtrack_project_id: str
+    azuredevops_project: str
+    azuredevops_repository: str
     naming_convention: NamingConvention
     release_cycle_days: int
     current_version: str | None = None

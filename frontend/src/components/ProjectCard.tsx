@@ -13,10 +13,6 @@ interface Props {
   onDeleted?: (id: string) => void;
 }
 
-const SOURCE_LABELS: Record<string, string> = {
-  youtrack: "YouTrack",
-  azuredevops: "Azure DevOps",
-};
 
 export default function ProjectCard({ project, onDeleted }: Props) {
   const { settings } = useUserSettings();
@@ -44,7 +40,7 @@ export default function ProjectCard({ project, onDeleted }: Props) {
           <h2 className="text-base font-semibold text-gray-900 truncate group-hover:text-blue-600">
             {project.name}
           </h2>
-          <span className="text-xs text-gray-400">{SOURCE_LABELS[project.source] ?? project.source}</span>
+          <span className="text-xs text-gray-400">YouTrack + Azure DevOps</span>
         </div>
         <div className="flex gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.preventDefault()}>
           <Link
